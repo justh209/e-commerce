@@ -1,9 +1,25 @@
 import {createOrder,getAllOrders} from '../service/order.service.js'
 import { PrismaClient } from '@prisma/client'
+import { z } from 'zod'
 const prisma = new PrismaClient({ log: ['query', 'info'] })
+
 
 export const createOrderAndProduct= async (req,res)=>{
     const {userId, products} = req.body
+    const zodBody = z.object({
+        userId: z.number(),
+        products: z.array(z.object({
+            productId: z.number(),
+            quantity: z.number()
+        }))
+    })
+    const validatedBody = ()=>{
+        try{
+            return zodBody.parse(req.body)
+        }catch(error){
+            res.status(404).json({})
+        }
+    }
     const orderProduct = await createOrder(userId,products)
     res.status(200).json({data: orderProduct})
 }

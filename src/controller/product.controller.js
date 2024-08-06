@@ -1,4 +1,5 @@
 import {showProductOfService,showProductByIdOfService,addProductOfService,updateProductOfService,deleteProductOfService} from '../service/product.service.js'
+import { z } from 'zod'
 
 export const showProduct = async (req, res) => {
     const name=req.query.name
@@ -17,6 +18,17 @@ export const showProductById = async (req, res) => {
 
 export const addProduct = async (req, res) => {
     const { name, price } = req.body
+    const zodBody = z.object({
+        name: z.string(),
+        price: z.number()
+    })
+    try{
+        const parsed= zodBody.parse(req.body)
+    }
+    catch(error){
+        return res.status(400).json({ error: error })
+        return
+    }
     if (!name ||!price) {
         return res.status(400).json({ error: 'Missing name or price' })
     }
